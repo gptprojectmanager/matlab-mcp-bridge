@@ -24,11 +24,11 @@ Write-Host ""
 function Write-Status {
     param($Message, $Type = "Info")
     switch ($Type) {
-        "Success" { Write-Host "✅ $Message" -ForegroundColor Green }
-        "Error"   { Write-Host "❌ $Message" -ForegroundColor Red }
-        "Warning" { Write-Host "⚠️ $Message" -ForegroundColor Yellow }
-        "Info"    { Write-Host "ℹ️ $Message" -ForegroundColor Cyan }
-        "Progress" { Write-Host "🔄 $Message" -ForegroundColor Magenta }
+        "Success" { Write-Host "[SUCCESS] $Message" -ForegroundColor Green }
+        "Error"   { Write-Host "[ERROR] $Message" -ForegroundColor Red }
+        "Warning" { Write-Host "[WARNING] $Message" -ForegroundColor Yellow }
+        "Info"    { Write-Host "[INFO] $Message" -ForegroundColor Cyan }
+        "Progress" { Write-Host "[PROGRESS] $Message" -ForegroundColor Magenta }
     }
 }
 
@@ -186,20 +186,20 @@ const svc = new Service({
 
 // Listen for the 'install' event, which indicates the process is available as a service
 svc.on('install', function() {
-    console.log('✅ Service installed successfully');
+    console.log('[SUCCESS] Service installed successfully');
     svc.start();
 });
 
 svc.on('start', function() {
-    console.log('✅ Service started successfully');
+    console.log('[SUCCESS] Service started successfully');
 });
 
 svc.on('error', function(err) {
-    console.error('❌ Service error:', err);
+    console.error('[ERROR] Service error:', err);
 });
 
 // Install the service
-console.log('🔄 Installing service...');
+console.log('[PROGRESS] Installing service...');
 svc.install();
 "@
 
@@ -234,14 +234,14 @@ const svc = new Service({
 });
 
 svc.on('uninstall', function() {
-    console.log('✅ Service uninstalled successfully');
+    console.log('[SUCCESS] Service uninstalled successfully');
 });
 
 svc.on('error', function(err) {
-    console.error('❌ Service error:', err);
+    console.error('[ERROR] Service error:', err);
 });
 
-console.log('🔄 Uninstalling service...');
+console.log('[PROGRESS] Uninstalling service...');
 svc.uninstall();
 "@
 
