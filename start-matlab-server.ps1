@@ -182,6 +182,11 @@ process.on('SIGINT', () => {
         
         # Create service installation script
         $installScriptPath = Join-Path $ServerDirectory "install-service.mjs"
+        
+        # Escape paths properly for JavaScript
+        $escapedServicePath = $servicePath -replace '\\', '\\\\'
+        $escapedMatlabPath = $MatlabPath -replace '\\', '\\\\'
+        
         $installScript = @"
 import { Service } from 'node-windows';
 
@@ -189,13 +194,13 @@ import { Service } from 'node-windows';
 const svc = new Service({
     name: '$ServiceName',
     description: 'MATLAB MCP Server for cross-platform communication',
-    script: '$servicePath',
+    script: '$escapedServicePath',
     nodeOptions: [
         '--max_old_space_size=4096'
     ],
     env: {
         name: 'MATLAB_PATH',
-        value: '$MatlabPath'
+        value: '$escapedMatlabPath'
     }
 });
 
@@ -265,7 +270,7 @@ import { Service } from 'node-windows';
 
 const svc = new Service({
     name: '$ServiceName',
-    script: '$(Join-Path $ServerDirectory "service-wrapper.js")'
+    script: '$($servicePath -replace '\\', '\\\\')'
 });
 
 svc.on('uninstall', function() {
