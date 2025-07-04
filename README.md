@@ -18,7 +18,7 @@ Claude Code (Ubuntu) → MCP Bridge Proxy (Ubuntu:8085) → SSH Tunnel → MATLA
 - Script di test e avvio
 
 ⏳ **In sospeso:**
-- Connessione SSH al Windows 192.168.1.111 (non raggiungibile)
+- Connessione SSH al Windows <IP_ADDRESS> (da configurare)
 - Integrazione real-time con MATLAB server
 
 ## Setup Rapido
@@ -26,7 +26,7 @@ Claude Code (Ubuntu) → MCP Bridge Proxy (Ubuntu:8085) → SSH Tunnel → MATLA
 ### 1. Avvio Bridge (Modalità Simulazione)
 
 ```bash
-cd /home/sam/matlab-mcp-bridge
+cd <PROJECT_PATH>
 ./start.sh
 ```
 
@@ -52,7 +52,7 @@ Il bridge è già configurato in `.claude.json`:
 ### Prerequisiti Windows
 
 1. **SSH Server** installato e configurato
-2. **MATLAB** installato (default: `E:\MATLAB\bin\matlab.exe`)
+2. **MATLAB** installato (esempio: `<MATLAB_DRIVE>:\MATLAB\bin\matlab.exe`)
 3. **MATLAB MCP Server** installato in `C:\Users\%USERNAME%\matlab-mcp-server`
 4. **Node.js** installato
 5. **Firewall** configurato per permettere SSH
@@ -75,7 +75,7 @@ Il bridge è già configurato in `.claude.json`:
 .\start-matlab-server.ps1 -ForceReinstall -InstallService
 
 # Con percorso MATLAB personalizzato
-.\start-matlab-server.ps1 -MatlabPath "C:\MATLAB\R2024a\bin\matlab.exe" -InstallService
+.\start-matlab-server.ps1 -MatlabPath "<MATLAB_PATH>" -InstallService
 
 # Rimozione servizio
 .\start-matlab-server.ps1 -UninstallService
@@ -100,7 +100,7 @@ Get-Service -Name "MatlabMCPServer"
 #### Opzione Manuale
 ```cmd
 # Imposta variabile ambiente
-set MATLAB_PATH=E:\MATLAB\bin\matlab.exe
+set MATLAB_PATH=<MATLAB_DRIVE>:\MATLAB\bin\matlab.exe
 
 # Naviga alla directory del server
 cd C:\Users\%USERNAME%\matlab-mcp-server
@@ -145,16 +145,16 @@ node build\index.js
 ./connect-matlab.sh
 
 # Test SSH manuale
-ssh -i ~/.ssh/matlab_key samue@192.168.1.111 "echo 'Connected successfully'"
+ssh -i ~/.ssh/matlab_key <USERNAME>@<WINDOWS_IP_ADDRESS> "echo 'Connected successfully'"
 
 # Test tunnel SSH
-ssh -L 8086:localhost:3000 samue@192.168.1.111
+ssh -L 8086:localhost:3000 <USERNAME>@<WINDOWS_IP_ADDRESS>
 ```
 
 ## Struttura Progetto
 
 ```
-/home/sam/matlab-mcp-bridge/
+/<PROJECT_PATH>/
 ├── server.js              # Bridge proxy principale
 ├── package.json            # Dipendenze Node.js
 ├── test.js                # Suite di test
@@ -171,9 +171,9 @@ ssh -L 8086:localhost:3000 samue@192.168.1.111
 
 ```bash
 PORT=8085
-MATLAB_HOST=192.168.1.111
+MATLAB_HOST=<WINDOWS_IP_ADDRESS>
 MATLAB_SSH_PORT=22
-MATLAB_SSH_USER=samue
+MATLAB_SSH_USER=<USERNAME>
 MATLAB_SSH_PASSWORD=        # Optional
 MATLAB_SSH_KEY_PATH=        # Preferito
 ```
@@ -192,10 +192,10 @@ Il bridge espone i seguenti tool MATLAB:
 
 ```bash
 # Verifica connettività
-ping 192.168.1.111
+ping <WINDOWS_IP_ADDRESS>
 
 # Verifica porta SSH
-nc -z 192.168.1.111 22
+nc -z <WINDOWS_IP_ADDRESS> 22
 ```
 
 ### Bridge Non Risponde
