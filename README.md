@@ -47,24 +47,84 @@ Il bridge è già configurato in `.claude.json`:
 }
 ```
 
-## Connessione al MATLAB Server Windows
+## Setup Windows MATLAB Server
 
 ### Prerequisiti Windows
 
 1. **SSH Server** installato e configurato
-2. **MATLAB MCP Server** in esecuzione:
-   ```cmd
-   node C:/Users/samue/matlab-mcp-server/build/index.js
-   ```
-3. **Firewall** configurato per permettere SSH
+2. **MATLAB** installato (default: `E:\MATLAB\bin\matlab.exe`)
+3. **MATLAB MCP Server** installato in `C:\Users\%USERNAME%\matlab-mcp-server`
+4. **Node.js** installato
+5. **Firewall** configurato per permettere SSH
 
-### Comando di Connessione
+### Avvio MATLAB Server (Windows)
+
+#### Opzione 1: Script Batch (Consigliato)
+```cmd
+# Scarica lo script dalla repository
+start-matlab-server.bat
+```
+
+#### Opzione 2: Script PowerShell (Avanzato)
+```powershell
+# Esegui con PowerShell
+.\start-matlab-server.ps1
+
+# Con parametri personalizzati
+.\start-matlab-server.ps1 -MatlabPath "C:\MATLAB\R2023b\bin\matlab.exe" -Verbose
+```
+
+#### Opzione 3: Manuale
+```cmd
+# Imposta variabile ambiente
+set MATLAB_PATH=E:\MATLAB\bin\matlab.exe
+
+# Naviga alla directory del server
+cd C:\Users\%USERNAME%\matlab-mcp-server
+
+# Avvia il server
+node build\index.js
+```
+
+### Configurazione SSH Windows
+
+1. **Installa OpenSSH Server:**
+   ```powershell
+   Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+   ```
+
+2. **Configura e avvia SSH:**
+   ```powershell
+   Start-Service sshd
+   Set-Service -Name sshd -StartupType 'Automatic'
+   ```
+
+3. **Configura firewall:**
+   ```powershell
+   netsh advfirewall firewall add rule name="OpenSSH Port 22" dir=in action=allow protocol=TCP localport=22
+   ```
+
+4. **Configura chiavi SSH:**
+   ```powershell
+   # Crea directory .ssh
+   mkdir C:\Users\%USERNAME%\.ssh
+   
+   # Per utenti amministratori, usa:
+   mkdir C:\ProgramData\ssh
+   # E copia la chiave pubblica in:
+   # C:\ProgramData\ssh\administrators_authorized_keys
+   ```
+
+### Test Connettività (Ubuntu)
 
 ```bash
-# Test connettività
+# Test connettività di base
 ./connect-matlab.sh
 
-# Connessione SSH manuale
+# Test SSH manuale
+ssh -i ~/.ssh/matlab_key samue@192.168.1.111 "echo 'Connected successfully'"
+
+# Test tunnel SSH
 ssh -L 8086:localhost:3000 samue@192.168.1.111
 ```
 
@@ -122,7 +182,7 @@ nc -z 192.168.1.111 22
 ps aux | grep "node server.js"
 
 # Verifica porta
-ss -tulpn | grep :8085
+ss -tulpn | grep :8095
 
 # Restart bridge
 pkill -f "node server.js"
