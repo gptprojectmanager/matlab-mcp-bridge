@@ -59,22 +59,45 @@ Il bridge è già configurato in `.claude.json`:
 
 ### Avvio MATLAB Server (Windows)
 
-#### Opzione 1: Script Batch (Consigliato)
-```cmd
-# Scarica lo script dalla repository
-start-matlab-server.bat
-```
+#### Script PowerShell Avanzato (Consigliato)
 
-#### Opzione 2: Script PowerShell (Avanzato)
+**⚠️ Richiede privilegi Amministratore**
+
 ```powershell
-# Esegui con PowerShell
+# Setup completo con installazione automatica e servizio Windows
+# Esegui PowerShell come Amministratore
+.\start-matlab-server.ps1 -InstallService
+
+# Setup manuale (senza servizio)
 .\start-matlab-server.ps1
 
-# Con parametri personalizzati
-.\start-matlab-server.ps1 -MatlabPath "C:\MATLAB\R2023b\bin\matlab.exe" -Verbose
+# Reinstallazione forzata
+.\start-matlab-server.ps1 -ForceReinstall -InstallService
+
+# Con percorso MATLAB personalizzato
+.\start-matlab-server.ps1 -MatlabPath "C:\MATLAB\R2024a\bin\matlab.exe" -InstallService
+
+# Rimozione servizio
+.\start-matlab-server.ps1 -UninstallService
 ```
 
-#### Opzione 3: Manuale
+**✨ Funzionalità Script Avanzato:**
+- 🔄 **Auto-installazione** Git, Node.js, MATLAB MCP Server
+- 🔧 **Windows Service** con avvio automatico al boot
+- 🎯 **Rilevamento automatico** percorso MATLAB
+- ✅ **Gestione completa** installazione, avvio, rimozione
+- 🛡️ **Controlli sicurezza** privilegi amministratore
+
+#### Gestione Servizio Windows
+
+```powershell
+# Comandi servizio Windows
+Start-Service -Name "MatlabMCPServer"
+Stop-Service -Name "MatlabMCPServer"  
+Get-Service -Name "MatlabMCPServer"
+```
+
+#### Opzione Manuale
 ```cmd
 # Imposta variabile ambiente
 set MATLAB_PATH=E:\MATLAB\bin\matlab.exe
