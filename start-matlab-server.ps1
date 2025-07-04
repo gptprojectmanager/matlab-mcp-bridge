@@ -167,8 +167,9 @@ process.on('SIGINT', () => {
         npm install -g node-windows
         
         # Create service installation script
+        $installScriptPath = Join-Path $ServerDirectory "install-service.mjs"
         $installScript = @"
-const Service = require('node-windows').Service;
+import { Service } from 'node-windows';
 
 // Create a new service object
 const svc = new Service({
@@ -203,12 +204,11 @@ console.log('[PROGRESS] Installing service...');
 svc.install();
 "@
 
-        $installScriptPath = Join-Path $ServerDirectory "install-service.js"
         Set-Content -Path $installScriptPath -Value $installScript
         
         # Run service installation
         Set-Location $ServerDirectory
-        node install-service.js
+        node install-service.mjs
         
         Write-Status "Windows Service created and started successfully" "Success"
         return $true
@@ -226,7 +226,7 @@ function Uninstall-MatlabService {
     
     try {
         $uninstallScript = @"
-const Service = require('node-windows').Service;
+import { Service } from 'node-windows';
 
 const svc = new Service({
     name: '$ServiceName',
@@ -245,11 +245,11 @@ console.log('[PROGRESS] Uninstalling service...');
 svc.uninstall();
 "@
 
-        $uninstallScriptPath = Join-Path $ServerDirectory "uninstall-service.js"
+        $uninstallScriptPath = Join-Path $ServerDirectory "uninstall-service.mjs"
         Set-Content -Path $uninstallScriptPath -Value $uninstallScript
         
         Set-Location $ServerDirectory
-        node uninstall-service.js
+        node uninstall-service.mjs
         
         Write-Status "Windows Service removed successfully" "Success"
         return $true
