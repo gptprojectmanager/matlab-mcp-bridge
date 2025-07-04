@@ -164,7 +164,21 @@ process.on('SIGINT', () => {
     
     try {
         # Install node-windows for service management
+        Write-Status "Installing node-windows globally..." "Progress"
         npm install -g node-windows
+        
+        # Install node-windows locally in project directory for ES module import
+        Write-Status "Installing node-windows locally..." "Progress"
+        npm install node-windows
+        
+        # Verify node-windows installation
+        $nodeWindowsCheck = & npm list node-windows 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Status "node-windows not found locally, installing..." "Warning"
+            npm install node-windows --save
+        } else {
+            Write-Status "node-windows found locally" "Success"
+        }
         
         # Create service installation script
         $installScriptPath = Join-Path $ServerDirectory "install-service.mjs"
@@ -208,10 +222,31 @@ svc.install();
         
         # Run service installation
         Set-Location $ServerDirectory
-        node install-service.mjs
+        Write-Status "Executing service installation script..." "Progress"
+        $installResult = & node install-service.mjs 2>&1
         
-        Write-Status "Windows Service created and started successfully" "Success"
-        return $true
+        if ($LASTEXITCODE -eq 0) {
+            Write-Status "Service installation script executed successfully" "Success"
+            
+            # Wait a moment for service to be created
+            Start-Sleep -Seconds 3
+            
+            # Verify service was created
+            $service = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
+            if ($service) {
+                Write-Status "Windows Service '$ServiceName' created successfully" "Success"
+                Write-Status "Service status: $($service.Status)" "Info"
+                return $true
+            } else {
+                Write-Status "Service creation failed - service not found after installation" "Error"
+                Write-Status "Installation output: $installResult" "Error"
+                return $false
+            }
+        } else {
+            Write-Status "Service installation script failed with exit code: $LASTEXITCODE" "Error"
+            Write-Status "Error output: $installResult" "Error"
+            return $false
+        }
     } catch {
         Write-Status "Failed to create Windows Service: $_" "Error"
         return $false
